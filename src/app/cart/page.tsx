@@ -2,9 +2,13 @@
 
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Toplam fiyat hesaplama (Her adet değişiminde dinamik tetiklenir)
   const totalPrice = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
@@ -14,6 +18,46 @@ export default function CartPage() {
       style: "currency",
       currency: "TRY",
     }).format(price);
+  };
+
+  const handleCheckout = async () => {
+    // Test
+    const name = prompt("Lütfen teslimat alıcı adını giriniz:");
+    const address = prompt("Lütfen teslimat adresinizi giriniz:");
+    const phone = prompt("Lütfen telefon numaranızı giriniz:");
+
+    if (!name || !address || !phone) {
+      alert("Siparişi tamamlamak için kargo bilgileri zorunludur.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cart,
+          shippingInfo: { name, address, phone }
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        clearCart(); // Context'teki sepeti sıfırlıyoruz
+        // Sipariş onay sayfasına yönlendiriyoruz ve query param olarak sipariş numarasını geçiyoruz
+        router.push(`/checkout/success?orderNumber=${data.orderNumber}`);
+      } else {
+        alert(data.error || "Sipariş tamamlanırken bir hata oluştu.");
+      }
+    } catch (error) {
+      console.error("Checkout hatası:", error);
+      alert("Bir şeyler ters gitti.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -77,7 +121,13 @@ export default function CartPage() {
               <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
                 <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
                   <button
-                    onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                    onClick={() => {
+                      if (item.quantity <= 1) {
+                        removeFromCart(item.productId);
+                      } else {
+                        updateQuantity(item.productId, item.quantity - 1);
+                      }
+                    }}
                     className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition font-medium"
                   >
                     -
@@ -130,10 +180,11 @@ export default function CartPage() {
           </div>
 
           <button
-            onClick={() => alert("Sipariş tamamlama adımına entegrasyon hazır!")}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-3 rounded-xl transition shadow-sm block text-center"
+            onClick={handleCheckout}
+            disabled={isSubmitting}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-3 rounded-xl transition shadow-sm block text-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Alışverişi Tamamla
+            {isSubmitting ? "Sipariş Alınıyor..." : "Alışverişi Tamamla"}
           </button>
           
           <Link
