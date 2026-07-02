@@ -1,11 +1,18 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CartItem } from '@/types';
+import { Product } from '@/types';
+
+// Sepetteki her bir elemanın taşıyacağı veri yapısı
+export interface CartItem {
+  productId: number;
+  quantity: number;
+  product: Product; // Ürün detaylarını sepet sayfasında basabilmek için buraya ekliyoruz
+}
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (productId: number, quantity?: number) => void;
+  addToCart: (product: Product, quantity?: number) => void; // Artık sadece id değil, ürünün kendisini alıyor
   updateQuantity: (productId: number, quantity: number) => void;
   removeFromCart: (productId: number) => void;
   clearCart: () => void;
@@ -38,15 +45,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart, isInitialized]);
 
-  const addToCart = (productId: number, quantity = 1) => {
+  // Düzenlenen fonksiyon: Artık product nesnesini parametre olarak alıyor
+  const addToCart = (product: Product, quantity = 1) => {
     setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.productId === productId);
+      const existing = prevCart.find((item) => item.productId === product.id);
       if (existing) {
         return prevCart.map((item) =>
-          item.productId === productId ? { ...item, quantity: item.quantity + quantity } : item
+          item.productId === product.id ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...prevCart, { productId, quantity }];
+      // Yeni ürün eklenirken id'sini, miktarını ve tüm detaylarını (resim, fiyat vb.) tek seferde kaydediyoruz
+      return [...prevCart, { productId: product.id, quantity, product }];
     });
   };
 
