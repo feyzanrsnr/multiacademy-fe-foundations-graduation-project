@@ -124,9 +124,10 @@ export default function OrdersPage() {
 
       <div className="space-y-6">
         {orders.map((order) => (
-          <div
+          <Link
             key={order.id}
-            className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden"
+            href={`/orders/${order.id}`}
+            className="block bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer"
           >
             {/* Üst Bilgi Çubuğu */}
             <div className="bg-gray-50 border-b border-gray-100 p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs sm:text-sm">
@@ -188,7 +189,7 @@ export default function OrdersPage() {
                 </span>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
