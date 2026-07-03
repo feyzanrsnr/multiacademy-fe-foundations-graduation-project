@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE 1=1
     `;
-    const params: any[] = [];
+    const params: (string | number)[] = [];
 
     // 2. Arama Filtresi
     if (search) {

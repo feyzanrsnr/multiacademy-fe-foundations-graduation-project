@@ -91,7 +91,7 @@ export async function GET() {
     const orders = Object.values(ordersMap);
 
     return NextResponse.json({ success: true, orders }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Siparişler çekilirken hata oluştu:", error);
     return NextResponse.json(
       { success: false, error: "Sipariş geçmişi yüklenemedi." },

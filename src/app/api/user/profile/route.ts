@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
 export async function GET() {
   try {
     const userId = 1; // Projenin mevcut test kullanıcısı ID'si
@@ -11,14 +18,14 @@ export async function GET() {
       WHERE id = ?
     `);
     
-    const user = stmt.get(userId) as any;
+    const user = stmt.get(userId) as User | undefined;
 
     if (!user) {
       return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, user }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Profil bilgileri çekilirken hata oluştu:", error);
     return NextResponse.json({ error: "Profil bilgileri yüklenemedi." }, { status: 500 });
   }

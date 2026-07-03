@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       message: "Siparişiniz başarıyla oluşturuldu." 
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sipariş işlenirken hata oluştu:", error);
     return NextResponse.json({ error: "Sipariş oluşturulamadı." }, { status: 500 });
   }
