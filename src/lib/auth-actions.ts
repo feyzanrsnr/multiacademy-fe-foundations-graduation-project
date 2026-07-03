@@ -103,3 +103,50 @@ export async function getCurrentUser(): Promise<User | null> {
     return null;
   }
 }
+
+// ŞifDeğiştirme Aksiyonu
+export async function changePasswordAction(formData: FormData) {
+  const currentPassword = formData.get('currentPassword') as string;
+  const newPassword = formData.get('newPassword') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return { error: 'Lütfen tüm alanları doldurun.' };
+  }
+
+  if (newPassword !== confirmPassword) {
+    return { error: 'Yeni şifreler eşleşmiyor.' };
+  }
+
+  if (newPassword.length < 6) {
+    return { error: 'Yeni şifre en az 6 karakter olmalıdır.' };
+  }
+
+  try {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('session')?.value;
+
+    if (!sessionId) {
+      return { error: 'Oturum bulunamadı. Lütfen tekrar giriş yapın.' };
+    }
+
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(sessionId) as User | undefined;
+
+    if (!user) {
+      return { error: 'Kullanıcı bulunamadı.' };
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isPasswordValid) {
+      return { error: 'Mevcut şifre hatalı.' };
+    }
+
+    const password_hash = await bcrypt.hash(newPassword, 10);
+
+    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(password_hash, sessionId);
+
+    return { success: true };
+  } catch (error) {
+    return { error: 'Şifre değiştirilirken bir hata oluştu.' };
+  }
+}
