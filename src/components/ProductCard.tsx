@@ -1,6 +1,7 @@
 //CartContext hook'unu kullanarak ürünleri ekleye
 "use client";
 
+import React from "react";
 import { useCart } from "@/context/CartContext";
 import { Product } from "@/types";
 
@@ -8,7 +9,7 @@ interface ProductCardProps {
   product: Product;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+const ProductCard = React.memo(function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
   // Veritabanından gelen fiyata göre formatlama yapıyoruz
@@ -70,4 +71,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
     </div>
   );
-}
+});
+
+export default ProductCard;
