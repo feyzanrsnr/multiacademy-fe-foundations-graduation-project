@@ -23,6 +23,7 @@ function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -56,6 +57,33 @@ function HomePage() {
     fetchFeaturedProducts();
     checkAuth();
   }, []);
+
+  // Auto-slide effect
+  useEffect(() => {
+    if (featuredProducts.length <= 4) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % getTotalSlides());
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [featuredProducts.length]);
+
+  const getTotalSlides = () => {
+    return Math.ceil(featuredProducts.length / 4);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  const goToPrev = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + getTotalSlides()) % getTotalSlides());
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % getTotalSlides());
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("tr-TR").format(price);
@@ -131,7 +159,7 @@ function HomePage() {
       {/* Öne Çıkan Ürünler */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-950">Öne Çıkan Ürünler</h2>
+          <h2 className="text-xl font-bold text-white">Öne Çıkan Ürünler</h2>
           <Link href="/products" className="text-sm font-medium text-indigo-600 hover:underline">
             Tümünü Gör →
           </Link>
@@ -144,42 +172,98 @@ function HomePage() {
         ) : featuredProducts.length === 0 ? (
           <p className="text-center text-gray-500 py-12">Henüz öne çıkan ürün yok.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <div key={product.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
-                <Link href={`/products/${product.id}`} className="block relative aspect-square bg-gray-100">
-                  <img
-                    src={product.image_url || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600"}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-200"
-                  />
-                </Link>
-                <div className="p-4 flex flex-col grow space-y-2">
-                  <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">{product.category}</span>
-                  <Link href={`/products/${product.id}`} className="block">
-                    <h3 className="text-sm font-bold text-gray-950 hover:text-indigo-600 transition line-clamp-1">{product.name}</h3>
-                  </Link>
-                  <p className="text-xs text-gray-500 line-clamp-2 grow">{product.description}</p>
-                  <div className="pt-2 flex items-center justify-between">
-                    <span className="text-sm font-black text-gray-950">{formatPrice(product.price)} TL</span>
-                    <button
-                      onClick={() => {
-                        if (isAuthenticated) {
-                          addToCart(product);
-                          alert("Ürün sepete eklendi!");
-                        } else {
-                          window.location.href = "/login";
-                        }
-                      }}
-                      disabled={product.stock <= 0}
-                      className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition disabled:bg-gray-200 disabled:text-gray-400"
-                    >
-                      {product.stock > 0 ? "Sepete Ekle" : "Tükendi"}
-                    </button>
-                  </div>
-                </div>
+          <div className="relative">
+            {/* Carousel Container */}
+            <div className="overflow-hidden rounded-2xl">
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+              >
+                {Array.from({ length: getTotalSlides() }).map((_, slideIndex) => {
+                  const slideProducts = featuredProducts.slice(slideIndex * 4, (slideIndex + 1) * 4);
+                  if (slideProducts.length === 0) return null;
+
+                  return (
+                    <div key={slideIndex} className="min-w-full">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
+                        {slideProducts.map((product) => (
+                          <div key={product.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
+                            <Link href={`/products/${product.id}`} className="block relative aspect-square bg-gray-100">
+                              <img
+                                src={product.image_url || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600"}
+                                alt={product.name}
+                                className="w-full h-full object-cover transition-transform duration-200"
+                              />
+                            </Link>
+                            <div className="p-4 flex flex-col grow space-y-2">
+                              <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">{product.category}</span>
+                              <Link href={`/products/${product.id}`} className="block">
+                                <h3 className="text-sm font-bold text-gray-950 hover:text-indigo-600 transition line-clamp-1">{product.name}</h3>
+                              </Link>
+                              <p className="text-xs text-gray-500 line-clamp-2 grow">{product.description}</p>
+                              <div className="pt-2 flex items-center justify-between">
+                                <span className="text-sm font-black text-gray-950">{formatPrice(product.price)} TL</span>
+                                <button
+                                  onClick={() => {
+                                    if (isAuthenticated) {
+                                      addToCart(product);
+                                      alert("Ürün sepete eklendi!");
+                                    } else {
+                                      window.location.href = "/login";
+                                    }
+                                  }}
+                                  disabled={product.stock <= 0}
+                                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition disabled:bg-gray-200 disabled:text-gray-400"
+                                >
+                                  {product.stock > 0 ? "Sepete Ekle" : "Tükendi"}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            </div>
+
+            {/* Navigation Buttons */}
+            {getTotalSlides() > 1 && (
+              <>
+                <button
+                  onClick={goToPrev}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition z-10"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={goToNext}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition z-10"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Dot Indicators */}
+            {getTotalSlides() > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                {Array.from({ length: getTotalSlides() }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`w-3 h-3 rounded-full transition ${
+                      index === currentIndex ? 'bg-indigo-600' : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
