@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { logoutAction } from "@/lib/auth-actions";
+import { logoutAction, changePasswordAction } from "@/lib/auth-actions";
 
 interface UserProfile {
   id: number;
@@ -15,6 +15,9 @@ function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -46,6 +49,22 @@ function ProfilePage() {
     } catch (err) {
       console.error("Çıkış yapılırken hata oluştu:", err);
       setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (formData: FormData) => {
+    setPasswordError(null);
+    setPasswordSuccess(null);
+    
+    const result = await changePasswordAction(formData);
+    
+    if (result?.error) {
+      setPasswordError(result.error);
+    } else if (result?.success) {
+      setPasswordSuccess("Şifreniz başarıyla değiştirildi.");
+      setShowPasswordForm(false);
+      // Formu temizle
+      (document.getElementById('passwordForm') as HTMLFormElement)?.reset();
     }
   };
 
@@ -115,6 +134,87 @@ function ProfilePage() {
             })}
           </span>
         </div>
+      </div>
+
+      {/* Şifre Değiştirme Bölümü */}
+      <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-950">Şifre Değiştir</h2>
+          <button
+            onClick={() => setShowPasswordForm(!showPasswordForm)}
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition"
+          >
+            {showPasswordForm ? "İptal" : "Şifre Değiştir"}
+          </button>
+        </div>
+
+        {passwordSuccess && (
+          <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md mb-4">
+            <p className="text-sm font-medium text-green-800">{passwordSuccess}</p>
+          </div>
+        )}
+
+        {showPasswordForm && (
+          <form id="passwordForm" action={handlePasswordChange} className="space-y-4">
+            {passwordError && (
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                <p className="text-sm font-medium text-red-800">{passwordError}</p>
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
+                Mevcut Şifre
+              </label>
+              <input
+                id="currentPassword"
+                name="currentPassword"
+                type="password"
+                required
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                Yeni Şifre
+              </label>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                required
+                minLength={6}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                placeholder="••••••••"
+              />
+              <p className="text-xs text-gray-500">En az 6 karakter olmalıdır</p>
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Yeni Şifre (Tekrar)
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                minLength={6}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl transition shadow-sm"
+            >
+              Şifreyi Değiştir
+            </button>
+          </form>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
