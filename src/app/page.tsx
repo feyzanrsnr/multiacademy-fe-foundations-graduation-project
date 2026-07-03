@@ -131,7 +131,7 @@ function HomePage() {
       {/* Öne Çıkan Ürünler */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-950">Öne Çıkan Ürünler</h2>
+          <h2 className="text-xl font-bold text-white">Öne Çıkan Ürünler</h2>
           <Link href="/products" className="text-sm font-medium text-indigo-600 hover:underline">
             Tümünü Gör →
           </Link>
