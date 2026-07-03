@@ -72,14 +72,14 @@ function HomePage() {
       {/* Kategori Navigasyonu */}
       <div>
         <h2 className="text-xl font-bold text-gray-950 mb-4">Kategoriler</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <Link
-            href="/products?category=Elektronik"
+            href="/products?category=Aksesuar"
             className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-indigo-300 transition group"
           >
-            <div className="text-3xl mb-3">🎧</div>
-            <h3 className="font-bold text-gray-950 group-hover:text-indigo-600 transition">Elektronik</h3>
-            <p className="text-sm text-gray-500 mt-1">Teknoloji ürünleri ve aksesuarlar</p>
+            <div className="text-3xl mb-3">🧢</div>
+            <h3 className="font-bold text-gray-950 group-hover:text-indigo-600 transition">Aksesuar</h3>
+            <p className="text-sm text-gray-500 mt-1">Şık aksesuarlar</p>
           </Link>
           <Link
             href="/products?category=Giyim"
@@ -90,12 +90,28 @@ function HomePage() {
             <p className="text-sm text-gray-500 mt-1">Şık ve rahat kıyafetler</p>
           </Link>
           <Link
-            href="/products?category=Kitap"
+            href="/products?category=Teknoloji"
             className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-indigo-300 transition group"
           >
-            <div className="text-3xl mb-3">📚</div>
-            <h3 className="font-bold text-gray-950 group-hover:text-indigo-600 transition">Kitap</h3>
-            <p className="text-sm text-gray-500 mt-1">Eğitici ve eğlenceli kitaplar</p>
+            <div className="text-3xl mb-3">🔌</div>
+            <h3 className="font-bold text-gray-950 group-hover:text-indigo-600 transition">Teknoloji</h3>
+            <p className="text-sm text-gray-500 mt-1">Teknoloji ürünleri</p>
+          </Link>
+          <Link
+            href="/products?category=Kırtasiye"
+            className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-indigo-300 transition group"
+          >
+            <div className="text-3xl mb-3">📒</div>
+            <h3 className="font-bold text-gray-950 group-hover:text-indigo-600 transition">Kırtasiye</h3>
+            <p className="text-sm text-gray-500 mt-1">Kırtasiye ürünleri</p>
+          </Link>
+          <Link
+            href="/products?category=Yaşam"
+            className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-indigo-300 transition group"
+          >
+            <div className="text-3xl mb-3">☕</div>
+            <h3 className="font-bold text-gray-950 group-hover:text-indigo-600 transition">Yaşam</h3>
+            <p className="text-sm text-gray-500 mt-1">Yaşam ürünleri</p>
           </Link>
         </div>
       </div>

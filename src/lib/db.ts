@@ -75,9 +75,11 @@ if (categoryCheck.count === 0) {
   // Kategorileri Ekleme
   const insertCategory = db.prepare('INSERT INTO categories (name, slug, description) VALUES (?, ?, ?)');
   
-  const cat1 = insertCategory.run('Elektronik', 'elektronik', 'En son teknoloji ürünler, bilgisayarlar ve aksesuarlar.');
+  const cat1 = insertCategory.run('Aksesuar', 'aksesuar', 'En son teknoloji ürünler, bilgisayarlar ve aksesuarlar.');
   const cat2 = insertCategory.run('Giyim', 'giyim', 'Şık ve rahat her mevsime uygun kıyafetler.');
-  const cat3 = insertCategory.run('Kitap', 'kitap', 'Dünya klasiklerinden teknik dökümanlara kadar geniş arşiv.');
+  const cat3 = insertCategory.run('Teknoloji', 'teknoloji', 'Dünya klasiklerinden teknik dökümanlara kadar geniş arşiv.');
+  const cat4 = insertCategory.run('Kırtasiye', 'kırtasiye', 'Dünya klasiklerinden teknik dökümanlara kadar geniş arşiv.');
+  const cat5 = insertCategory.run('Yaşam', 'yaşam', 'Dünya klasiklerinden teknik dökümanlara kadar geniş arşiv.');
 
   // Ürünleri Ekleme
   const insertProduct = db.prepare(`
@@ -85,23 +87,55 @@ if (categoryCheck.count === 0) {
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
-  // Elektronik Ürünler (category_id: 1)
-  insertProduct.run('Kablosuz Kulaklık', 'Yüksek ses kaliteli, gürültü engelleyici kulaklık', 1299.99, 15, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', cat1.lastInsertRowid, 1);
-  insertProduct.run('Mekanik Klavye', 'RGB aydınlatmalı, Blue switch oyuncu klavyesi', 849.50, 20, 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500', cat1.lastInsertRowid, 1);
-  insertProduct.run('Oyuncu Mouse', '16000 DPI, ergonomik kablosuz optik mouse', 450.00, 30, 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500', cat1.lastInsertRowid, 0);
-  insertProduct.run('Taşınabilir SSD 1TB', 'USB 3.2 uyumlu, ultra hızlı harici depolama', 1899.00, 10, 'https://images.unsplash.com/photo-1601524909162-be87252be298?w=500', cat1.lastInsertRowid, 0);
+  // Aksesuar Ürünleri (category_id: 1)
+  insertProduct.run('Şapka - Siyah', 'Şık ve rahat günlük kullanım için siyah şapka', 299.99, 25, '/images/MultiGroup-şapka-black.jfif', cat1.lastInsertRowid, 1);
+
+  insertProduct.run('Şapka - Lacivert', 'Şık ve rahat günlük kullanım için lacivert şapka', 299.99, 25, '/images/MultiGroup-şapka-laci.jfif', cat1.lastInsertRowid, 1);
+
+  insertProduct.run('Şapka - Kırmızı', 'Şık ve rahat günlük kullanım için kırmızı şapka', 299.99, 25, '/images/MultiGroup-şapka-kırmızı.png', cat1.lastInsertRowid, 1);
+
+  insertProduct.run('Şapka - Bej', 'Şık ve rahat günlük kullanım için bej şapka', 299.99, 25, '/images/MultiGroup-şapka-bej.jfif', cat1.lastInsertRowid, 1);
+
+  insertProduct.run('Bez Çanta - Siyah', 'Dayanıklı kumaş, geniş iç hacimli bez çanta', 449.90, 30, '/images/MultiGroup-bez çanta.png', cat1.lastInsertRowid, 1);
+
+  insertProduct.run('Bez Çanta - Lacivert', 'Dayanıklı kumaş, geniş iç hacimli bez çanta', 449.90, 30, '/images/bez çanta-laci.png', cat1.lastInsertRowid, 1);
 
   // Giyim Ürünleri (category_id: 2)
-  insertProduct.run('Pamuklu Oversize Tişört', '%100 pamuk, rahat kesim günlük tişört', 299.99, 50, 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500', cat2.lastInsertRowid, 1);
-  insertProduct.run('Klasik Kot Ceket', 'Dayanıklı kumaş, zamansız tasarım kot ceket', 799.90, 12, 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=500', cat2.lastInsertRowid, 1);
-  insertProduct.run('Spor Ayakkabı', 'Yürüyüş ve koşu için uygun, nefes alan taban', 1499.00, 8, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', cat2.lastInsertRowid, 0);
-  insertProduct.run('Keten Gömlek', 'Yaz ayları için ideal, hafif ve şık kesim', 450.00, 25, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500', cat2.lastInsertRowid, 0);
+  insertProduct.run('Hoodie - Siyah', 'Rahat kesim, kaliteli kumaş siyah hoodie', 599.99, 40, '/images/MultiGroup-hoodie-black.png', cat2.lastInsertRowid, 1);
 
-  // Kitap Ürünleri (category_id: 3)
-  insertProduct.run('Temiz Kod (Clean Code)', 'Robert C. Martin yazarlık klasiği, sürdürülebilir yazılım rehberi', 180.00, 40, 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500', cat3.lastInsertRowid, 1);
-  insertProduct.run('Pragmatik Programcı', 'Yazılım geliştiriciler için kariyer ve kodlama tavsiyeleri', 220.00, 15, 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500', cat3.lastInsertRowid, 0);
-  insertProduct.run('TypeScript ile İleri Seviye Mimari', 'Derleyici teorisi ve tip güvenliği üzerine pratik rehber', 250.00, 18, 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=500', cat3.lastInsertRowid, 1);
-  insertProduct.run('Algoritmalar ve Veri Yapıları', 'Bilgisayar mühendisliğinin temellerini anlatan başucu eseri', 310.00, 22, 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500', cat3.lastInsertRowid, 0);
+  insertProduct.run('Hoodie - Beyaz', 'Rahat kesim, kaliteli kumaş beyaz hoodie', 599.99, 40, '/images/hoodie-white.png', cat2.lastInsertRowid, 1);
+
+  insertProduct.run('T-Shirt - Siyah', '%100 pamuk, oversize kesim siyah tişört', 349.99, 50, '/images/MultiGroup-tshirt-black.png', cat2.lastInsertRowid, 1);
+
+  insertProduct.run('T-Shirt - Beyaz', '%100 pamuk, oversize kesim beyaz tişört', 349.99, 50, '/images/MultiGroup-tshirt-whitej.png', cat2.lastInsertRowid, 1);
+
+  insertProduct.run('T-Shirt - Kırmızı', '%100 pamuk, oversize kesim kırmızı tişört', 349.99, 50, '/images/MultiGroup-tshirt-red.png', cat2.lastInsertRowid, 1);
+
+  
+
+  // Teknoloji Ürünleri (category_id: 3)
+  insertProduct.run('Powerbank', '20000mAh kapasiteli hızlı şarj powerbank', 699.99, 35, '/images/MultiGroup-powerbank.png', cat3.lastInsertRowid, 1);
+  insertProduct.run('Mousepad', 'Büyük boy, anti-kaymaz yüzey mousepad', 199.99, 45, '/images/MultiGroup-mousepad.png', cat3.lastInsertRowid, 1);
+
+  // Kırtasiye Ürünleri (category_id: 4)
+  insertProduct.run('Defter - Siyah', 'Kraft kapaklı, 100 yaprak kaliteli defter', 149.99, 60, '/images/MultiGroup-defter.jfif', cat4.lastInsertRowid, 1);
+
+  insertProduct.run('Defter - Beyaz', 'Kraft kapaklı, 100 yaprak kaliteli defter', 149.99, 60, '/images/defter-white.png', cat4.lastInsertRowid, 1);
+
+  insertProduct.run('Masa Takvimi', '2024 masa takvimi, şık tasarım', 89.99, 40, '/images/MultiGroup-masa takvimi.png', cat4.lastInsertRowid, 1);
+
+  // Yaşam Ürünleri (category_id: 5)
+  insertProduct.run('Termos - Siyah', '500ml kapasiteli, uzun süre sıcak tutan termos', 399.99, 25, '/images/MultiGroup-termos-black.jfif', cat5.lastInsertRowid, 1);
+
+  insertProduct.run('Termos - Beyaz', '500ml kapasiteli, uzun süre sıcak tutan termos', 399.99, 25, '/images/termos-white.png', cat5.lastInsertRowid, 1);
+
+  insertProduct.run('Küçük Termos - Siyah', '350ml kapasiteli, taşınabilir termos', 299.99, 30, '/images/MultiGroup-termos-küçük.png', cat5.lastInsertRowid, 1);
+
+  insertProduct.run('Küçük Termos - Kırmızı', '350ml kapasiteli, taşınabilir termos', 299.99, 30, '/images/kucuk-termos-red.png', cat5.lastInsertRowid, 1);
+
+  insertProduct.run('Kupa - Siyah', 'Seramik mat siyah kupa', 149.99, 50, '/images/MultiGroup-kupa-black.png', cat5.lastInsertRowid, 1);
+
+  insertProduct.run('Kupa - Beyaz', 'Seramik mat beyaz kupa', 149.99, 50, '/images/MultiGroup-kupa-white.jfif', cat5.lastInsertRowid, 1);
 
   console.log('Veritabanı şeması ve örnek veriler başarıyla yüklendi.');
 }

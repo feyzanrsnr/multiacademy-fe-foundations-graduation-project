@@ -118,9 +118,11 @@ function ProductsPage() {
             className="px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none bg-white text-gray-900"
           >
             <option value="">Tüm Kategoriler</option>
-            <option value="Elektronik">Elektronik</option>
+            <option value="Aksesuar">Aksesuar</option>
             <option value="Giyim">Giyim</option>
-            <option value="Kitap">Kitap</option>
+            <option value="Teknoloji">Teknoloji</option>
+            <option value="Kırtasiye">Kırtasiye</option>
+            <option value="Yaşam">Yaşam</option>
           </select>
 
           <select
