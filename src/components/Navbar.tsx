@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { logoutAction } from "@/lib/auth-actions";
@@ -15,8 +15,10 @@ export default function Navbar() {
   const { cart } = useCart();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Sepetteki toplam ürün sayısını hesaplayalım
+  // Sepetteki toplam ürün sayısı
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
@@ -39,6 +41,22 @@ export default function Navbar() {
 
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   const handleLogout = async () => {
     try {
@@ -67,14 +85,64 @@ export default function Navbar() {
 
           {/* Navigasyon Linkleri */}
           <nav className="flex items-center gap-4">
-            {/* Siparişlerim Linki - sadece giriş yapmış kullanıcılar için */}
-            {user && (
-              <Link 
-                href="/orders" 
-                className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition"
-              >
-                Siparişlerim
-              </Link>
+
+            {/* Giriş/Kayıt veya Profil/Çıkış Butonu */}
+            {loading ? (
+              <div className="w-24 h-10 bg-gray-100 rounded-xl animate-pulse" />
+            ) : user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl shadow-sm transition"
+                >
+                  👤 Hesabım
+                  <svg className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Hesap Bilgilerim
+                    </Link>
+                    <Link
+                      href="/orders"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Siparişlerim
+                    </Link>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+                    >
+                      Çıkış Yap
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link 
+                  href="/login" 
+                  className="text-sm font-medium text-gray-600 hover:text-white transition px-4 py-2 rounded-xl hover:bg-indigo-600"
+                >
+                  Giriş Yap
+                </Link>
+                |
+                <Link 
+                  href="/register" 
+                  className="text-sm font-medium text-gray-600 hover:text-white transition px-4 py-2 rounded-xl hover:bg-indigo-600"
+                >
+                  Kayıt Ol
+                </Link>
+              </div>
             )}
 
             {/* Sepetim Butonu - sadece giriş yapmış kullanıcılar için */}
@@ -91,41 +159,6 @@ export default function Navbar() {
                   </span>
                 )}
               </Link>
-            )}
-
-            {/* Giriş/Kayıt veya Profil/Çıkış Butonu */}
-            {loading ? (
-              <div className="w-24 h-10 bg-gray-100 rounded-xl animate-pulse" />
-            ) : user ? (
-              <div className="flex items-center gap-2">
-                <Link 
-                  href="/profile" 
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl shadow-sm transition"
-                >
-                  👤 Hesabım
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-sm font-medium text-gray-600 hover:text-red-600 transition px-2"
-                >
-                  Çıkış
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link 
-                  href="/login" 
-                  className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition"
-                >
-                  Giriş Yap
-                </Link>
-                <Link 
-                  href="/register" 
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl shadow-sm transition"
-                >
-                  Kayıt Ol
-                </Link>
-              </div>
             )}
           </nav>
         </div>
