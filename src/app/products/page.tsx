@@ -61,7 +61,7 @@ function ProductsPage() {
     <div className="space-y-8 p-4 md:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-6">
-        <h1 className="text-3xl font-extrabold text-gray-900">Ürünler ({products.length})</h1>
+        <h1 className="text-3xl font-extrabold text-white">Ürünler ({products.length})</h1>
         <Link href="/" className="text-indigo-600 font-medium hover:text-indigo-800 transition">Ana Sayfa</Link>
       </div>
 
@@ -110,7 +110,12 @@ function ProductsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((p) => (
             <div key={p.id} className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-col gap-3 shadow-sm hover:shadow-md transition duration-300">
+              <Link
+                  href={`/products/${p.id}`}
+                  className="block aspect-square bg-gray-100 rounded-xl mb-4 overflow-hidden"
+                >
               <img src={p.image_url} alt={p.name} className="h-48 w-full object-cover rounded-xl" />
+              </Link>
               <h3 className="font-bold text-gray-900 truncate">{p.name}</h3>
               <p className="text-xs text-gray-500 mt-1 mb-4 line-clamp-2 grow">
                     {p.description}
