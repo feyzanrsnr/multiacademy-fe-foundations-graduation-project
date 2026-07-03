@@ -26,6 +26,7 @@ function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     if (!params.id) return;
@@ -48,7 +49,18 @@ function ProductDetailPage() {
       }
     };
 
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/status");
+        const data = await res.json();
+        setIsAuthenticated(data.authenticated);
+      } catch (err) {
+        setIsAuthenticated(false);
+      }
+    };
+
     fetchProduct();
+    checkAuth();
   }, [params.id]);
 
   if (loading) {
@@ -139,21 +151,25 @@ function ProductDetailPage() {
                 {/* Sepete Ekle Butonu */}
                 <button
                   onClick={() => {
-                    addToCart({
-                      id: product.id,
-                      name: product.name,
-                      description: product.description,
-                      category: product.category,
-                      price: product.price,
-                      stock: product.stock,
-                      image_url: product.image_url || "",
-                      category_id: product.category_id || 0,
-                      is_featured: product.is_featured || 0,
-                      created_at: product.created_at || new Date().toISOString()
-                    }, quantity);
-                    alert(`${quantity} adet ${product.name} başarıyla sepete eklendi!`);
+                    if (isAuthenticated) {
+                      addToCart({
+                        id: product.id,
+                        name: product.name,
+                        description: product.description,
+                        category: product.category,
+                        price: product.price,
+                        stock: product.stock,
+                        image_url: product.image_url || "",
+                        category_id: product.category_id || 0,
+                        is_featured: product.is_featured || 0,
+                        created_at: product.created_at || new Date().toISOString()
+                      }, quantity);
+                      alert(`${quantity} adet ${product.name} başarıyla sepete eklendi!`);
+                    } else {
+                      window.location.href = "/login";
+                    }
                   }}
-                  className="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-sm target-button active:scale-98"
+                  className="grow bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-sm target-button active:scale-98"
                 >
                   Sepete Ekle
                 </button>

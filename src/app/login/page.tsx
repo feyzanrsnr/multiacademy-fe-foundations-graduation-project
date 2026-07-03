@@ -20,9 +20,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError(result.error);
     } else if (result?.success) {
-      // Giriş başarılıysa sayfayı yenile ve ana sayfaya at (Navbar'ın güncellenmesi için)
-      router.push("/");
-      router.refresh();
+      window.location.href = "/";
     }
   }
 

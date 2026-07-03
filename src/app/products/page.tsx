@@ -30,6 +30,7 @@ function ProductsPage() {
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [sort, setSort] = useState(searchParams.get("sort") || "");
   const [searchInput, setSearchInput] = useState(searchTerm);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -65,7 +66,18 @@ function ProductsPage() {
       }
     };
 
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/status");
+        const data = await res.json();
+        setIsAuthenticated(data.authenticated);
+      } catch (err) {
+        setIsAuthenticated(false);
+      }
+    };
+
     fetchProducts();
+    checkAuth();
   }, [searchTerm, sort, category]);
 
   const updateURL = (key: string, value: string) => {
@@ -175,18 +187,22 @@ function ProductsPage() {
                   className="w-full h-full object-cover transition-transform duration-200"
                 />
               </Link>
-              <div className="p-4 flex flex-col flex-grow space-y-2">
+              <div className="p-4 flex flex-col grow space-y-2">
                 <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">{product.category}</span>
                 <Link href={`/products/${product.id}`} className="block">
                   <h3 className="text-sm font-bold text-gray-950 hover:text-indigo-600 transition line-clamp-1">{product.name}</h3>
                 </Link>
-                <p className="text-xs text-gray-500 line-clamp-2 flex-grow">{product.description}</p>
+                <p className="text-xs text-gray-500 line-clamp-2 grow">{product.description}</p>
                 <div className="pt-2 flex items-center justify-between">
                   <span className="text-sm font-black text-gray-950">{formatPrice(product.price)} TL</span>
                   <button
                     onClick={() => {
-                      addToCart(product);
-                      alert("Ürün sepete eklendi!");
+                      if (isAuthenticated) {
+                        addToCart(product);
+                        alert("Ürün sepete eklendi!");
+                      } else {
+                        window.location.href = "/login";
+                      }
                     }}
                     disabled={product.stock <= 0}
                     className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition disabled:bg-gray-200 disabled:text-gray-400"

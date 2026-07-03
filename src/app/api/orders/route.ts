@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import db from "@/lib/db";
 
 
@@ -37,6 +38,13 @@ interface OrderMapValue {
 
 export async function GET() {
   try {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('session')?.value;
+
+    if (!sessionId) {
+      return NextResponse.json({ success: false, error: "Oturum bulunamadı." }, { status: 401 });
+    }
+
     const stmt = db.prepare(`
       SELECT 
         o.id AS orderId,
@@ -55,10 +63,11 @@ export async function GET() {
       FROM orders o
       LEFT JOIN order_items oi ON o.id = oi.order_id
       LEFT JOIN products p ON oi.product_id = p.id
+      WHERE o.user_id = ?
       ORDER BY o.created_at DESC
     `);
 
-    const rows = stmt.all() as OrderRow[];
+    const rows = stmt.all(sessionId) as OrderRow[];
 
     const ordersMap: Record<number, OrderMapValue> = {};
 

@@ -19,9 +19,7 @@ export default function RegisterPage() {
     if (result?.error) {
       setError(result.error);
     } else if (result?.success) {
-      // Kayıt başarılıysa session cookie'si atandığı için doğrudan ana sayfaya yönlendir
-      router.push("/");
-      router.refresh();
+      window.location.href = "/";
     }
   }
 

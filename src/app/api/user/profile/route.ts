@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import db from "@/lib/db";
 
 interface User {
@@ -10,7 +11,12 @@ interface User {
 
 export async function GET() {
   try {
-    const userId = 1; // Projenin mevcut test kullanıcısı ID'si
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('session')?.value;
+
+    if (!sessionId) {
+      return NextResponse.json({ error: "Oturum bulunamadı." }, { status: 401 });
+    }
 
     const stmt = db.prepare(`
       SELECT id, name, email, created_at AS createdAt 
@@ -18,7 +24,7 @@ export async function GET() {
       WHERE id = ?
     `);
     
-    const user = stmt.get(userId) as User | undefined;
+    const user = stmt.get(sessionId) as User | undefined;
 
     if (!user) {
       return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });

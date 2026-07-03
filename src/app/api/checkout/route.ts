@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import db from "@/lib/db";
 import { CartItem } from "@/types";
 
@@ -10,8 +11,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Sepetiniz boş." }, { status: 400 });
     }
 
-    
-    const userId = 1; 
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('session')?.value;
+
+    if (!sessionId) {
+      return NextResponse.json({ error: "Oturum bulunamadı. Lütfén giriş yapın." }, { status: 401 });
+    }
+
+    const userId = sessionId;
     const orderNumber = "ORD-" + Math.floor(100000 + Math.random() * 900000);
     
     

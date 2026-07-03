@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { logoutAction } from "@/lib/auth-actions";
 
 interface UserProfile {
   id: number;
@@ -37,10 +38,15 @@ function ProfilePage() {
     fetchProfile();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user_session"); 
-    alert("Başarıyla çıkış yapıldı. Giriş sayfasına yönlendiriliyorsunuz.");
-    window.location.href = "/";
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      await logoutAction();
+      window.location.href = "/login";
+    } catch (err) {
+      console.error("Çıkış yapılırken hata oluştu:", err);
+      setLoading(false);
+    }
   };
 
   if (loading) {
