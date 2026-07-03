@@ -10,7 +10,6 @@ export default function CartPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Toplam fiyat hesaplama (Her adet değişiminde dinamik tetiklenir)
   const totalPrice = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
   const formatPrice = (price: number) => {
@@ -20,44 +19,8 @@ export default function CartPage() {
     }).format(price);
   };
 
-  const handleCheckout = async () => {
-    // Test
-    const name = prompt("Lütfen teslimat alıcı adını giriniz:");
-    const address = prompt("Lütfen teslimat adresinizi giriniz:");
-    const phone = prompt("Lütfen telefon numaranızı giriniz:");
-
-    if (!name || !address || !phone) {
-      alert("Siparişi tamamlamak için kargo bilgileri zorunludur.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cart,
-          shippingInfo: { name, address, phone }
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        clearCart(); // Context'teki sepeti sıfırlıyoruz
-        // Sipariş onay sayfasına yönlendiriyoruz ve query param olarak sipariş numarasını geçiyoruz
-        router.push(`/checkout/success?orderNumber=${data.orderNumber}`);
-      } else {
-        alert(data.error || "Sipariş tamamlanırken bir hata oluştu.");
-      }
-    } catch (error) {
-      console.error("Checkout hatası:", error);
-      alert("Bir şeyler ters gitti.");
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleCheckout = () => {
+    router.push("/checkout");
   };
 
   if (cart.length === 0) {
